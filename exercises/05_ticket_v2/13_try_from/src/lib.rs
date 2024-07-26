@@ -8,6 +8,32 @@ enum Status {
     Done,
 }
 
+use std::convert::TryFrom;
+
+#[derive(Debug, PartialEq)]
+struct ParseStatusError(String);
+
+impl TryFrom<String> for Status {
+    type Error = ParseStatusError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Status::try_from(value.as_str())
+    }
+}
+
+impl TryFrom<&str> for Status {
+    type Error = ParseStatusError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "todo" => Ok(Status::ToDo),
+            "inprogress" => Ok(Status::InProgress),
+            "done" => Ok(Status::Done),
+            _ => Err(ParseStatusError(format!("Invalid status: {}", value))),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
